@@ -1,0 +1,32 @@
+name: 影片清單自動同步機器人
+
+on:
+  schedule:
+    # 這裡設定每小時執行一次 (UTC 時間)
+    - cron: '0 * * * *'
+  workflow_dispatch: # 保留手動觸發按鈕，以備不時之需
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 檢查程式碼
+        uses: actions/checkout@v3
+
+      - name: 從 Google Sheets 抓取最新資料
+        run: |
+          # 請確認這裡的網址是你發佈的 CSV 連結
+          CSV_URL="這裡貼上你的_CSV_網址"
+          
+          curl -L "$CSV_URL" > data.csv
+          echo "{" > videos.json
+          awk -F',' 'NR>1 {printf "  \"%s\": \"%s\",\n", $1, $2}' data.csv | sed '$ s/,$//' >> videos.json
+          echo "}" >> videos.json
+
+      - name: 自動儲存變更
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add videos.json
+          git commit -m "定時更新影片清單" || echo "無資料異動"
+          git push

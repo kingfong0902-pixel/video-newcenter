@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>影片轉跳中...</title>
+</head>
+<body>
+    <div id="msg" style="text-align:center; margin-top:20%; font-family: sans-serif;">
+        <h2>正在為您載入最新影片...</h2>
+    </div>
+    <script>
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR5cv-bf6-8F6Z9qSb7E_M04rFIzfN1_hNT-D55NfnLtNOMWcuWkv6gPC9YXxKVOWroaeykD7rTkyTt/pub?output=csv';
+
+        async function doRedirect() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoKey = urlParams.get('v');
+
+            try {
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                const rows = data.split('\n');
+                const videoMap = {};
+
+                rows.forEach(row => {
+                    const columns = row.split(',');
+                    if (columns.length >= 2) {
+                        videoMap[columns[0].trim()] = columns[1].trim();
+                    }
+                });
+
+                if (videoKey && videoMap[videoKey]) {
+                    window.location.replace("https://www.youtube.com/watch?v=" + videoMap[videoKey]);
+                } else {
+                    document.getElementById('msg').innerHTML = "<h1>抱歉，找不到該影片連結</h1>";
+                }
+            } catch (e) {
+                document.getElementById('msg').innerHTML = "系統維護中，請稍後再試";
+            }
+        }
+        doRedirect();
+    </script>
+</body>
+</html>

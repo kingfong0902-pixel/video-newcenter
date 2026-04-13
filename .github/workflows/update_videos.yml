@@ -16,7 +16,7 @@ jobs:
       - name: 從 Google Sheets 抓取最新資料
         run: |
           # 請確認這裡的網址是你發佈的 CSV 連結
-          CSV_URL="這裡貼上你的_CSV_網址"
+          CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vR5cv-bf6-8F6Z9qSb7E_M04rFIzfN1_hNT-D55NfnLtNOMWcuWkv6gPC9YXxKVOWroaeykD7rTkyTt/pub?output=csv"
           
           curl -L "$CSV_URL" > data.csv
           echo "{" > videos.json
